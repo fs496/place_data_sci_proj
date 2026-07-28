@@ -3,6 +3,8 @@ Clean and plot the natural disasters data.
 """
 import pandas as pd
 import re
+import seaborn.objects as so
+
 
 SAVE_FOLDER = "(TOP FOLDER REMOVED FOR PRIVACY)"
 DATA_FOLDER = f"{SAVE_FOLDER}/data"
@@ -41,6 +43,7 @@ if __name__ == '__main__':
     # Concatenate 20th and 21st century data frames
     df_21 = df_21.rename(columns={'Death toll': 'Deaths'})
     df = pd.concat([df_20, df_21])
+    df = df.reset_index(drop=True)
     
     # Drop a null row
     df = df.dropna(how='all', axis=0)
@@ -72,3 +75,26 @@ if __name__ == '__main__':
     # and the Managua earthquake (4,000-11,000 deaths) - possibly because it
     # is unclear which was deadlier
     
+    # Want to label some of the deadliest events
+    df_plot = df.copy(deep=True)
+    df_plot.loc[df_plot.deaths <= 250000, 'event'] = ''
+    fig1 = (
+        so.Plot(df_plot, x="year", y="deaths", color="type", text='event')
+        .add(so.Dot())
+        .add(so.Text(halign='right', valign='bottom', offset=2, color='black', fontsize=6.5))
+        .label(title = """Deadliest natural disaster each year by death toll, 1901-2026
+               Events with over 250,000 deaths labelled""")
+        .label(x='Year', y='Number of deaths', color='Disaster type')
+        .limit(x=(1890, None))
+    )
+    fig1.save(f"{SAVE_FOLDER}/figures/fig1.png", dpi=400, bbox_inches = "tight")
+    
+    # Now with log scale axes to better see the spread of the data
+    fig2 = (
+        so.Plot(df_plot, x="year", y="deaths", color="type")
+        .add(so.Dot())
+        .scale(y='log')
+        .label(title = "Deadliest natural disaster each year by death toll, 1901-2026 - Log Scale")
+        .label(x='Year', y='Number of deaths', color='Disaster type')
+    )
+    fig2.save(f"{SAVE_FOLDER}/figures/fig2.png", dpi=400, bbox_inches='tight')

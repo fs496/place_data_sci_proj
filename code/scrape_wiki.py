@@ -14,10 +14,14 @@ def parse_table(table) -> pd.DataFrame:
     in the tables. The tables contain merged cells within a given column,
     resulting in values that must be forward-filled into subsequent rows.
     
-    Arguments:
-        table (bs4.element.Tag): Tag that contains a table
+    Parameters
+    ----------
+    table: bs4.element.Tag
+        Tag that contains a table
     
-    Returns:
+    Returns
+    -------
+    pd.DataFrame
         A pandas Data.Frame containing the parsed table
     """
     columns = [tag.text for tag in table.find_all('th')]

@@ -10,6 +10,10 @@ def parse_table(table) -> pd.DataFrame:
     """
     Parse a table tag to create a pandas DataFrame.
     
+    This function includes special handling to deal with merged cells
+    in the tables. The tables contain merged cells within a given column,
+    resulting in values that must be forward-filled into subsequent rows.
+    
     Arguments:
         table (bs4.element.Tag): Tag that contains a table
     
@@ -25,7 +29,7 @@ def parse_table(table) -> pd.DataFrame:
         # Set up a blank dictionary for the row
         row_data = {j: "" for j in range(0, len(columns))}
         # Check to see if we have any ongoing merged cells
-        # any columns from earlier rows
+        # from any columns from earlier rows
         insert_previous_vals = {
             j: True if rowspans[j] > 1 else False
             for j in range(0, len(columns))
@@ -40,7 +44,7 @@ def parse_table(table) -> pd.DataFrame:
                 rowspans[j] = rowspans[j] - 1
         
         # Now iterate through the data points for the current row
-        for i, col_val in enumerate(row.find_all('td')):
+        for col_val in row.find_all('td'):
             # Find the first empty value of the row data
             # That's actual column that we are on
             j = [k for k, v in row_data.items() if v == ""][0]

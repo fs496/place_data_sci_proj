@@ -76,7 +76,7 @@ if __name__ == '__main__':
     page = requests.get(url, headers=headers)
     
     soup = BeautifulSoup(page.content, 'html.parser')
-    # Find the 20th century deadliest disasters table
+    # Find the 20th and 21st century deadliest disasters tables
     table_20 = soup.find_all('table', id='mwvA')[0]
     table_21 = soup.find_all('table', id='mwA9g')[0]
 

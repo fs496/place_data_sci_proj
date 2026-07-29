@@ -3,6 +3,7 @@ Gradient descent for loss minimization for the problem L(b) = ||y - bx||^2
 where y and x are two vectors and b is a scalar.
 """
 import numpy as np
+import warnings
 
 
 def validate_inputs(x: np.ndarray, y: np.ndarray):
@@ -151,6 +152,9 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
         b_new = b_current - e * grad
         L_new = get_loss(x, y, b_new)
         
+        if np.isinf(grad):
+            warnings.warn("Gradient is infinitely large")
+        
         # Determine whether we have converged
         if stop_on in ['loss', 'step']:
             param_diff = get_param_diff(
@@ -181,7 +185,7 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
 
 
 if __name__ == '__main__':
-    x = np.array([1, 1, 1])
-    y = np.array([1, 1, 2]) * 1000000
+    x = np.array([1, 1])
+    y = np.array([1, 2])
     b_true = get_b(x, y)
-    res = minimize_loss(x, y, b0=500, e=0.1, rel=True, stop_on='grad')
+    res = minimize_loss(x, y, b0=2, e=0.01, rel=False, stop_on='step')

@@ -4,6 +4,9 @@ where y and x are two vectors and b is a scalar.
 """
 import numpy as np
 import warnings
+from tqdm import tqdm
+import pandas as pd
+import itertools
 
 
 def validate_inputs(x: np.ndarray, y: np.ndarray):
@@ -145,12 +148,14 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
         stop_param_new = lambda: b_new
     else:
         assert stop_on == 'grad', f'Unrecognized value of stop_on: {stop_on}'
-
+    
+    grad_path = [[np.nan, b_current, L_current]]
     for i in range(0, int(max_iters)):
-        # Execute a step of gradient descent
+        # Execute a step of gradient descent (this is dL/db(b_current))
         grad = -2 * np.dot(y - b_current * x, x)
         b_new = b_current - e * grad
         L_new = get_loss(x, y, b_new)
+        grad_path.append([grad, b_new, L_new])
         
         if np.isinf(grad):
             warnings.warn("Gradient is infinitely large")
@@ -179,13 +184,61 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
         'converged': converged,
         'b_min': b_new,
         'L_min': L_new,
-        'num_steps': num_steps
+        'num_steps': num_steps,
+        'grad_path': np.array(grad_path)
     }
     return results
 
 
 if __name__ == '__main__':
-    x = np.array([1, 1])
-    y = np.array([1, 2])
-    b_true = get_b(x, y)
-    res = minimize_loss(x, y, b0=2, e=0.01, rel=False, stop_on='step')
+    # x = np.array([1, 1])
+    # y = np.array([1, 2])
+    # b_true = get_b(x, y)
+    # res = minimize_loss(x, y, b0=2, e=0.01, rel=True, stop_on='loss')
+    
+    # Set seed
+    # Generate random x's and y's of length n, calculate b_true's
+    vec_len = 2
+    num_trials = 3
+    rng = np.random.default_rng()
+    trials = [
+        {
+            'id': i,
+            'x': rng.normal(loc=0, scale=1, size=(vec_len,)),
+            'y': rng.normal(loc=0, scale=1, size=(vec_len,)),
+        } for i in range(num_trials)
+    ]
+
+    # Generate true bs and random b0s
+    for i in range(num_trials):
+        trials[i]['b_true'] = get_b(trials[i]['x'], trials[i]['y'])
+        trials[i]['b0'] = rng.normal(loc=0, scale=1)
+
+    # Run gradient descent on the x, y pairs for a range of e values
+    # Calculate performance for each run of gradient descent: convergence,
+    # number of steps needed to converge, and error |b_true - b_min|
+    # Save gradient descent trajectories for each one?
+    e_vals = [1e-5, 1e-4, 0.001, 0.01, 0.1, 0.5, 1]
+    save_data = []
+    for e, trial in tqdm(itertools.product(e_vals, trials)):
+        result = minimize_loss(
+            x=trial['x'],
+            y=trial['y'],
+            b0=trial['b0'],
+            e=e
+        )
+        data = {**result, **trial}
+        data['e'] = e
+        data['error_b'] = (
+            np.abs((data['b_min'] - data['b_true']) / data['b_true'])
+        )
+        save_data.append(data)
+    
+    df = pd.DataFrame(save_data)
+
+    # Plot performance against: e, ||x||, ||y||, ||x||/||y||,
+    # angle between x and y, ratio of b0/b_true,
+    # Combinations of e and the other input params
+    # Repeat for different stopping criteria if possible - start with
+    # stop_on = loss, rel=True
+    # Repeat for different vector lengths?

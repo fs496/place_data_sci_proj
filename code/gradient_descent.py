@@ -67,8 +67,17 @@ def get_loss(x: np.ndarray, y: np.ndarray, b: np.float64) -> np.float64:
     return np.linalg.norm(y - b * x) ** 2
 
 
+def get_param_diff(param_current, param_new, rel=True):
+    if rel:
+        param_diff = (param_new - param_current) / (1 + np.abs(param_current))
+    else:
+        param_diff = param_new - param_current
+    return param_diff
+
+
 def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
-                  tol: float=1e-6, max_iters: int=1e6) -> dict:
+                  tol: float=1e-6, rel: bool=True, stop_on: str='loss',
+                  max_iters: int=1e6) -> dict:
     """
     Minimize the loss function L(b) = ||y - bx||^2 using gradient
     descent.
@@ -84,9 +93,21 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
     e: float
         Learning rate or step size in the gradient descent algorithm
     tol: float, optional
-        Stopping criteria for gradient descent. If the absolute change in L(b)
-        in the last step is less than this tolerance, the algorithm is declared
-        to converge and ends. The default is 1e-6.
+        Tolerance for the stopping criteria for gradient descent. The default
+        is 1e-6.
+    rel: bool, optional
+        Whether the tolerance for the stopping criteria should be applied on
+        the relative difference of the stopping parameter (see stop_on).
+    stop_on: str, optional
+        Stopping method used for gradient descent. The accepted options are:
+            'loss': Stop when the absolute or relative difference (see rel)
+                in the loss function is smaller than the tolerance in absolute
+                value.
+            'step': Stop when the absolute or relative difference (see rel)
+                in the step size is smaller than the tolerance in absolute
+                value.
+            'grad': Stop when the absolute value of the gradient is less than
+                the tolerance. rel is ignored when using this method.
     max_iters: int, optional
         Maximum allowed iterations in gradient descent. The default is 1e6.
 
@@ -96,36 +117,64 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
         A dictionary containing the results of the gradient descent
         minimization.
     """
+    # Validation
     validate_inputs(x, y)
+    assert e > 0
+    assert tol > 0
+    assert max_iters > 0
     # Some validation of b0?
-
-    L_current = get_loss(x, y, b0)
-    diff_L = 1
+    
+    # Initialize key values
     b_current = b0
+    L_current = get_loss(x, y, b0)
     converged = False
     num_steps = 0
+
+    # Set these temporarily so that we can define some functions on them
+    grad = 0
+    b_new = 0
+    L_new = 0
+    
+    # Set stopping criteria
+    if stop_on == 'loss':
+        stop_param_current = lambda: L_current
+        stop_param_new = lambda: L_new
+    elif stop_on == 'step':
+        stop_param_current = lambda: b_current
+        stop_param_new = lambda: b_new
+    else:
+        assert stop_on == 'grad', f'Unrecognized value of stop_on: {stop_on}'
+
     for i in range(0, int(max_iters)):
+        # Execute a step of gradient descent
         grad = -2 * np.dot(y - b_current * x, x)
         b_new = b_current - e * grad
         L_new = get_loss(x, y, b_new)
         
-        diff_L = L_new - L_current
+        # Determine whether we have converged
+        if stop_on in ['loss', 'step']:
+            param_diff = get_param_diff(
+                stop_param_current(), stop_param_new(), rel=rel
+            )
+            if (np.abs(param_diff)) < tol:
+                converged = True
+                num_steps = i + 1
+                break
+        else:
+            if np.abs(grad) < tol:
+                converged = True
+                num_steps = i + 1
+                break
 
         L_current = L_new
         b_current = b_new
 
-        if (np.abs(diff_L) < tol) & (diff_L <= 0):
-            converged = True
-            num_steps = i + 1
-            break
-
-    if num_steps == 0:
-        num_steps = max_iters
+    num_steps = max_iters if num_steps == 0 else num_steps
 
     results = {
         'converged': converged,
-        'b_min': b_current,
-        'L_min': L_current,
+        'b_min': b_new,
+        'L_min': L_new,
         'num_steps': num_steps
     }
     return results
@@ -135,4 +184,4 @@ if __name__ == '__main__':
     x = np.array([1, 1, 1])
     y = np.array([1, 1, 2]) * 1000000
     b_true = get_b(x, y)
-    res = minimize_loss(x, y, b0=500, e=0.1)
+    res = minimize_loss(x, y, b0=500, e=0.1, rel=True, stop_on='grad')

@@ -8,6 +8,8 @@ from tqdm import tqdm
 import pandas as pd
 import itertools
 
+SAVE_FOLDER = "(TOP FOLDER REMOVED FOR PRIVACY)"
+
 
 def validate_inputs(x: np.ndarray, y: np.ndarray):
     """
@@ -140,6 +142,8 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
     L_new = 0
     
     # Set stopping criteria
+    # Would be better to refactor this as a class and set these
+    # as instance attributes - but do it this way to save time
     if stop_on == 'loss':
         stop_param_current = lambda: L_current
         stop_param_new = lambda: L_new
@@ -150,9 +154,9 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
         assert stop_on == 'grad', f'Unrecognized value of stop_on: {stop_on}'
     
     grad_path = [[np.nan, b_current, L_current]]
-    for i in range(0, int(max_iters)):
-        # Execute a step of gradient descent (this is dL/db(b_current))
-        grad = -2 * np.dot(y - b_current * x, x)
+    for i in range(int(max_iters)):
+        # Execute a step of gradient descent
+        grad = -2 * np.dot(y - b_current * x, x)  # L'(b_current)
         b_new = b_current - e * grad
         L_new = get_loss(x, y, b_new)
         grad_path.append([grad, b_new, L_new])
@@ -190,16 +194,12 @@ def minimize_loss(x: np.ndarray, y: np.ndarray, b0: float, e: float,
     return results
 
 
-if __name__ == '__main__':
-    # x = np.array([1, 1])
-    # y = np.array([1, 2])
-    # b_true = get_b(x, y)
-    # res = minimize_loss(x, y, b0=2, e=0.01, rel=True, stop_on='loss')
-    
-    # Set seed
-    # Generate random x's and y's of length n, calculate b_true's
-    vec_len = 2
-    num_trials = 3
+if __name__ == '__main__':    
+    # Generate random x's and y's from a normal distribution - chose
+    # to use a normal distribution rather than uniform to avoid extreme
+    # values that blow up the gradient
+    vec_len = 2  # Testing vectors of length 2 for simplicity
+    num_trials = 100
     rng = np.random.default_rng()
     trials = [
         {
@@ -209,23 +209,24 @@ if __name__ == '__main__':
         } for i in range(num_trials)
     ]
 
-    # Generate true bs and random b0s
+    # Calculate true bs and generate random b0s
     for i in range(num_trials):
         trials[i]['b_true'] = get_b(trials[i]['x'], trials[i]['y'])
         trials[i]['b0'] = rng.normal(loc=0, scale=1)
 
-    # Run gradient descent on the x, y pairs for a range of e values
-    # Calculate performance for each run of gradient descent: convergence,
-    # number of steps needed to converge, and error |b_true - b_min|
-    # Save gradient descent trajectories for each one?
-    e_vals = [1e-5, 1e-4, 0.001, 0.01, 0.1, 0.5, 1]
+    # Run gradient descent on the x, y, b0 values for a range of e values
+    e_vals = [1e-5, 1e-4, 1e-3, 0.01, 0.1, 0.5, 1]
     save_data = []
+    rel = True
+    stop_on = 'loss'
     for e, trial in tqdm(itertools.product(e_vals, trials)):
         result = minimize_loss(
             x=trial['x'],
             y=trial['y'],
             b0=trial['b0'],
-            e=e
+            e=e,
+            rel=rel,
+            stop_on=stop_on
         )
         data = {**result, **trial}
         data['e'] = e
@@ -234,7 +235,12 @@ if __name__ == '__main__':
         )
         save_data.append(data)
     
+    # Save this result as a pickled dataframe
+    # Saved outside repository because it is too large to push to GitHub
     df = pd.DataFrame(save_data)
+    df.to_pickle(
+        f"{SAVE_FOLDER}/grad_desc_rel_{rel}_stop_on_{stop_on}.pkl"
+    )
 
     # Plot performance against: e, ||x||, ||y||, ||x||/||y||,
     # angle between x and y, ratio of b0/b_true,

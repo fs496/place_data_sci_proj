@@ -56,6 +56,6 @@ Figure 6 shows convergence rates by $||x||$ as well as $e$. A noticeable trend i
 
 **Figure 7**
 
-![Figure 7](/figures/Median%20number%20of%20steps%20per%20run%20by%20Step%20size%20(e)%20and%20Length%20of%20x.png")
+![Figure 7](/figures/Median%20number%20of%20steps%20per%20run%20by%20Step%20size%20(e)%20and%20Length%20of%20x.png)
 
 Figure 7 shows the median number of steps needed for convergence by $||x||$ as well as $e$. A noticeable trend is that when both $e$ and $||x||$ are small, the number of steps needed for convergence increases dramatically (up to more than 250,000 steps). This is likely because the small magnitude of $x$ decreases the change in $b$ at each iteration, making the algorithm much slower. Thus, small $||x||$ improves convergence for large $e$ but decreases speed for small $e$.

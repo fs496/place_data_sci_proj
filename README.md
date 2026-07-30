@@ -14,3 +14,9 @@ This graph highlights how in unpredictable years, certain events caused extremel
 ![Figure 2](/figures/fig2.png)
 
 This graph shows the same data as the previous one, but this time plotting the number of deaths for each event on a log scale. This helps to better visualize the spread of the data, rather than highlighting the highest death toll events. There doesn't appear to be a strong trend in death toll over time, meaning the death toll from the deadliest natural disaster each year hasn't been increasing or decreasing over time. You can also see from the graph that earthquake is the most common type of deadliest natural disaster in this time period, with tropical cyclones as the second most common type. Out of the 126 years represented on the graph, in 61 years the deadliest disaster involved an earthquake, and in 37 years the deadliest disaster involved a tropical cyclone.
+
+## Gradient descent testing
+
+### Background and method
+
+In this section, we test the dependence of the gradient descent algorithm on the algorithm's step size. We are minimizing the loss function $L(b) = ||y-bx||^2$, where $y$ and $x$ are vectors and $b$ is a scalar, over $b$. The gradient descent algorithm iterates on an initial guess of $b$, $b_0$, such that $b_{n+1} = b_n - eL'(b)$, where $e$ is the step size.

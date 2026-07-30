@@ -7,6 +7,8 @@ The data for the following plots of the deadliest natural disasters each year fr
 
 ![Figure 1](/figures/fig1.png)
 
+**Figure 3**
+
 This graph shows the deadliest natural disaster each year from 1901-2026, plotted by the death toll for each disaster, excluding epidemics and famines. The color of each point represents the type of disaster that occurred, such as flood or landslide. For certain disasters, only an estimated range was available for the death toll; in these cases, the plot shows the midpoint of the range as the death toll. In 1972, there are two disasters represented on the graph, because it's unclear which was the deadliest that year: the Qir earthquake which caused 5,374 deaths and the Managua earthquake, which caused 4,000-11,000 deaths.
 
 This graph highlights how in unpredictable years, certain events caused extremely high numbers of deaths, appearing as labelled outliers in the graph. The median number of deaths caused by the deadliest disaster in a given year is 6,434. The four events with the highest death tolls are much higher: the 1931 China floods (~2.2 million deaths), 1976 Tangshan earthquake (~450,000 deaths), 1970 Bhola cyclone (~400,000 deaths), and 1920 Haiyuan earthquake (~270,000 deaths).
@@ -23,3 +25,16 @@ In this section, we test the dependence of the gradient descent algorithm on the
 
 To test the dependence of this algorithm on $e$, we generated 100 random problem sets of unique $x$, $y$, and $b_0$ values. We tested vectors of length 2 for $x$ and $y$ for simplicity. The elements of $x$, $y$, and $b_0$ were sampled randomly from the $N(0, 1)$ distribution, to avoid extreme values that cause the gradient $L'(b)$ to be extremely large. We then ran gradient descent for each of the 100 problem sets, once for each of a range of $e$ values: 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, and 1. There are several possible stopping criteria for gradient descent, including on the absolute and relative change in $b$, absolute and relative change in $L(b)$, and magnitude of $L'(b)$. For the purposes of this testing, we considered gradient descent to have converged when the relative change in $L(b)$ was less than a tolerance of $10^{-6}$. We set a maximum number of iterations of $10^{6}$; if the algorithm did not reach the stopping criteria before then, it was considered not converged.
 
+### Results and analysis
+
+![Figure 3](/figures/fig_conv.png)
+
+**Figure 3**
+
+![Figure 4](/figures/fig_steps.png)
+
+**Figure 4**
+
+![Figure 5](/figures/fig_err.png)
+
+**Figure 5**

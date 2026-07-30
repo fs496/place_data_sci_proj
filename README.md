@@ -46,8 +46,16 @@ Figure 3 shows the convergence rate (number of runs that successfully converged)
 
 Thus, from a performance perspective, the optimal value of $e$ for the problems tested lies in the 0.01-0.1 range. In general, the best value of $e$ must balance the need to take bigger steps for better speed and accuracy, with the need to take smaller steps to avoid overshooting.
 
-We also examined the relationship between the performance of the algorithm (convergence rate, number of steps, and accuracy) with other factors, such as $||x||$, $||y||$, $\frac{||x||}{||y||}$, the angle between $x$ and $y$ ($\theta$), and the percent error in the initial guess $b_0$ compared to the true $b$ (how far off the initial guess is).
+We also examined the relationship between the performance of the algorithm (convergence rate, number of steps, and accuracy) with other factors, such as $||x||$, $||y||$, $\frac{||x||}{||y||}$, the angle between $x$ and $y$ ($\theta$), and the percent error in the initial guess $b_0$ compared to the true $b$ (how far off the initial guess is). Only $||x||$ showed a noticeable relationship to performance.
+
+**Figure 6**
 
 ![Figure 6](/figures/Convergence%20rate%20(percent)%20by%20Step%20size%20(e)%20and%20Length%20of%20x.png)
 
 Figure 6 shows convergence rates by $||x||$ as well as $e$. A noticeable trend is that even when $e$ is large, for small $||x||$ convergence rates are close to 100%. This is likely because the small magnitude of $x$ decreases the change in $b$ at each iteration, making overshooting less likely.
+
+**Figure 7**
+
+![Figure 7](/figures/Median%20number%20of%20steps%20per%20run%20by%20Step%20size%20(e)%20and%20Length%20of%20x.png")
+
+Figure 7 shows the median number of steps needed for convergence by $||x||$ as well as $e$. A noticeable trend is that when both $e$ and $||x||$ are small, the number of steps needed for convergence increases dramatically (up to more than 250,000 steps). This is likely because the small magnitude of $x$ decreases the change in $b$ at each iteration, making the algorithm much slower. Thus, small $||x||$ improves convergence for large $e$ but decreases speed for small $e$.

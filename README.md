@@ -48,3 +48,6 @@ Thus, from a performance perspective, the optimal value of $e$ for the problems 
 
 We also examined the relationship between the performance of the algorithm (convergence rate, number of steps, and accuracy) with other factors, such as $||x||$, $||y||$, $\frac{||x||}{||y||}$, the angle between $x$ and $y$ ($\theta$), and the percent error in the initial guess $b_0$ compared to the true $b$ (how far off the initial guess is).
 
+![Figure 6]("/figures/Convergence rate (percent) by Step size (e) and Length of x.png")
+
+Figure 6 shows convergence rates by $||x||$ as well as $e$. A noticeable trend is that even when $e$ is large, for small $||x||$ convergence rates are close to 100%. This is likely because the small magnitude of $x$ decreases the change in $b$ at each iteration, making overshooting less likely.

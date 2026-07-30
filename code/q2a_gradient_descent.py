@@ -242,9 +242,3 @@ if __name__ == '__main__':
         f"{SAVE_FOLDER}/grad_desc_rel_{rel}_stop_on_{stop_on}.pkl"
     )
 
-    # Plot performance against: e, ||x||, ||y||, ||x||/||y||,
-    # angle between x and y, ratio of b0/b_true,
-    # Combinations of e and the other input params
-    # Repeat for different stopping criteria if possible - start with
-    # stop_on = loss, rel=True
-    # Repeat for different vector lengths?

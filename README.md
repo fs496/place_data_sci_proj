@@ -5,13 +5,16 @@ Data science project for placement exam
 
 The data for the following plots of the deadliest natural disasters each year from 1901-2026 were scraped from the Wikipedia page: [List of natural disasters by death toll](https://en.wikipedia.org/wiki/List_of_natural_disasters_by_death_toll#).
 
+**Figure 1**
+
 ![Figure 1](/figures/fig1.png)
 
-**Figure 3**
 
 This graph shows the deadliest natural disaster each year from 1901-2026, plotted by the death toll for each disaster, excluding epidemics and famines. The color of each point represents the type of disaster that occurred, such as flood or landslide. For certain disasters, only an estimated range was available for the death toll; in these cases, the plot shows the midpoint of the range as the death toll. In 1972, there are two disasters represented on the graph, because it's unclear which was the deadliest that year: the Qir earthquake which caused 5,374 deaths and the Managua earthquake, which caused 4,000-11,000 deaths.
 
 This graph highlights how in unpredictable years, certain events caused extremely high numbers of deaths, appearing as labelled outliers in the graph. The median number of deaths caused by the deadliest disaster in a given year is 6,434. The four events with the highest death tolls are much higher: the 1931 China floods (~2.2 million deaths), 1976 Tangshan earthquake (~450,000 deaths), 1970 Bhola cyclone (~400,000 deaths), and 1920 Haiyuan earthquake (~270,000 deaths).
+
+**Figure 2**
 
 ![Figure 2](/figures/fig2.png)
 
@@ -27,14 +30,18 @@ To test the dependence of this algorithm on $e$, we generated 100 random problem
 
 ### Results and analysis
 
-![Figure 3](/figures/fig_conv.png)
-
 **Figure 3**
 
-![Figure 4](/figures/fig_steps.png)
+![Figure 3](/figures/fig_conv.png)
 
 **Figure 4**
 
-![Figure 5](/figures/fig_err.png)
+![Figure 4](/figures/fig_steps.png)
 
 **Figure 5**
+
+![Figure 5](/figures/fig_err.png)
+
+Figure 3 shows the convergence rate (number of runs that successfully converged) for each value of $e$. We can see that the algorithm's convergence rate is at or close to 100% for step sizes less than or equal to 0.1, but drops significantly for step sizes 0.5 and 1.0. This is a consequence of the fact that if $e$ is too large, gradient descent can easily overshoot the true value of $b_min$, leading to divergence. Figure 4 shows the distribution of the number of steps needed to converge (for runs that successfully converged) over values of $e$. We can see that while all values of $e$ less than 0.5 have high convergence rates, decreasing $e$ by an order of magnitude results in a roughly order of magnitude increase in the number of steps needed to converge. This corresponds to the fact that $|b_{n+1} - b_n|$ is constrained by the size of $e$; if $e$ is extremely small, the algorithm will require many more steps to converge. Figure 5 shows a final performance metric, the percent error in the estimated value of $b$ compared to its true value for runs that converged. Decreasing $e$ significantly increases the percent error in the estimate; for example, at $e=10^{-5}$, the median percent error is around 30%. This corresponds to the fact that for extremely small $e$, it is possible for the algorithm to reach the stopping criteria (AKA convergence) despite not actually having reached the minimum of the loss function, because the change in $L(b)$ at any given step is constrained by $e$.
+
+Thus, from a performance perspective, the optimal value of $e$ for the problems tested lies in the 0.001-0.01 range, and general the best value of $e$ must balance the need to take bigger steps for speed with avoiding overshooting.
